@@ -21,9 +21,9 @@ const cateogorySearch=async(req,res)=>{
         const products=await Product.find(query).skip(skip).limit(limitNum);
         
         const totalProducts=await Product.countDocuments(query);
-        const totalPages=MAth.ceil(totalProducts/LimitNum);
+        const totalPages=Math.ceil(totalProducts/limitNum);
 
-        if(products.lenght===0)
+        if(products.length===0)
             return res.status(StatusCodes.NOT_FOUND).json({message:"No products found in this category"});
 
         return res.status(StatusCodes.OK).json({
@@ -42,7 +42,7 @@ const idSearch=async(req,res)=>{
     const productId=req.params.id;
     try {
         if(!mongoose.Types.ObjectId.isValid(productId)){
-            return res.stastus(StatusCodes.BAD_REQUEST).json({
+            return res.status(StatusCodes.BAD_REQUEST).json({
                 success:false,
                 message:"Invalid product ID format"
             });
