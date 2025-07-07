@@ -4,10 +4,10 @@ const mongoose=require('mongoose');
 
 const cateogorySearch=async(req,res)=>{
     try {
-        const category=req.params.category;
+        const {category}=req.params;
         const {page=1,limit=10}=req.query;
 
-        if(!category || typeof category!=string){
+        if(!category || typeof category!=="string"){
             return res.status(StatusCodes.BAD_REQUEST).json({message:"Invalid category name"})
         }
 
@@ -33,6 +33,7 @@ const cateogorySearch=async(req,res)=>{
             totalPages,
         });
     } catch (error) {
+        console.log(`Error searching products by category: ${error}`);
         return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
             message:"An error occurred while searching for products"
         })
@@ -41,12 +42,12 @@ const cateogorySearch=async(req,res)=>{
 const idSearch=async(req,res)=>{
     const productId=req.params.id;
     try {
-        if(!mongoose.Types.ObjectId.isValid(productId)){
-            return res.status(StatusCodes.BAD_REQUEST).json({
-                success:false,
-                message:"Invalid product ID format"
-            });
-        }
+        // if(!mongoose.Types.ObjectId.isValid(productId)){
+        //     return res.status(StatusCodes.BAD_REQUEST).json({
+        //         success:false,
+        //         message:"Invalid product ID format"
+        //     });
+        // }
 
         const product=await Product.findById(productId);
         if(!product){
@@ -66,7 +67,55 @@ const idSearch=async(req,res)=>{
 }
 
 const fuzzySearch=async(req,res)=>{
-    res.send("fuzzy search")
+    try {
+        const {q=" ",page=1,limit=10}=req.query;
+        if(!q||typeof q!=="string"){
+            return res.status(StatusCodes.BAD_REQUEST).json({message:"Invalid search query"});
+        }
+
+        const pipeline=[
+            {
+                $search:{
+                    index:"product-search",
+                    compound:{
+                        should:[
+                            {
+                                autocomplete:{
+                                    query:q,
+                                    path:"product_name",
+                                    fuzzy:{maxEdits:2}
+                                }
+                            },
+                            {
+                                text:{
+                                    query:q,
+                                    path:["brand","description","breadcrumbs"],
+                                    fuzzy:{maxEdits:2}
+                                }
+                            }
+                        ]
+                    }
+                }
+            },
+            {$skip: (parseInt(page,10)-1)*parseInt(limit,10)},
+            { $limit: parseInt(limit) }
+        ]
+
+        const products=await Product.aggregate(pipeline);
+        const count=products.length;
+        return res.status(StatusCodes.OK).json({
+            success:true,
+            products,
+            count
+
+        })
+    } catch (error) {
+        console.log(`error searching products: ${error}`)
+        return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+            message:"An error occurred while searching for products"
+        })
+    }
+
 }
 
 module.exports={cateogorySearch,idSearch,fuzzySearch};

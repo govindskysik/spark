@@ -8,7 +8,8 @@ const userRouter=require('./routes/user')
 app.use(express.json());
 
 app.use('/user',userRouter);
-app.get('/addData')
+// app.get('/addData')
+app.use('/app',require('./routes/index'));
 
 
 const start=async()=>{
