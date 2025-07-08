@@ -1,68 +1,103 @@
-:root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
+@import "tailwindcss";
+
+/* Everyday Sans Web Font Faces */
+@font-face {
+  font-family: 'Everyday Sans Web';
+  src: url('./assets/fonts/EverydaySans-Light-Web.woff2') format('woff2'),
+       url('./assets/fonts/EverydaySans-Light-Web.woff') format('woff');
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Everyday Sans Web';
+  src: url('./assets/fonts/EverydaySans-Regular-Web.woff2') format('woff2'),
+       url('./assets/fonts/EverydaySans-Regular-Web.woff') format('woff');
   font-weight: 400;
+  font-style: normal;
 
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
-
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  font-display: swap;
 }
 
-a {
+@font-face {
+  font-family: 'Everyday Sans Web';
+  src: url('./assets/fonts/EverydaySans-Medium-Web.woff2') format('woff2'),
+       url('./assets/fonts/EverydaySans-Medium-Web.woff') format('woff');
   font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
-}
-a:hover {
-  color: #535bf2;
+  font-style: normal;
+  font-display: swap;
 }
 
-body {
-  margin: 0;
-  display: flex;
-  place-items: center;
-  min-width: 320px;
-  min-height: 100vh;
+@font-face {
+  font-family: 'Everyday Sans Web';
+  src: url('./assets/fonts/EverydaySans-Bold-Web.woff2') format('woff2'),
+       url('./assets/fonts/EverydaySans-Bold-Web.woff') format('woff');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
 }
 
-h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
+@font-face {
+  font-family: 'Everyday Sans Web';
+  src: url('./assets/fonts/EverydaySans-Black-Web.woff2') format('woff2'),
+       url('./assets/fonts/EverydaySans-Black-Web.woff') format('woff');
+  font-weight: 900;
+  font-style: normal;
+  font-display: swap;
 }
 
-button {
-  border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
-  font-family: inherit;
-  background-color: #1a1a1a;
-  cursor: pointer;
-  transition: border-color 0.25s;
-}
-button:hover {
-  border-color: #646cff;
-}
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
+@theme {
+  /* Custom Font Families */
+  --font-family-walmart: 'Everyday Sans Web', system-ui, sans-serif;
+  --font-family-body: 'Everyday Sans Web', system-ui, sans-serif;
+
+  /* Custom Colors */
+  --color-true-blue: #0053E2;
+  --color-everyday-blue: #4DBDF5;
+  --color-sky-blue: #A9DDF7;
+  --color-bentonville-blue: #001E60;
+  --color-spark-yellow: #FFC220;
+  --color-success: #22c55e;
+  --color-warning: #f59e0b;
+  --color-danger: #ef4444;
 }
 
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
+/* LAYER 1: Base Styles - Essential foundation */
+@layer base {
+  body {
+    font-family: var(--font-family-body);
+    font-weight: 400;
+    line-height: 1.6;
+    font-feature-settings: "liga", "kern";
   }
-  a:hover {
-    color: #747bff;
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-family-walmart);
+    font-weight: 500;
+    line-height: 1.2;
   }
-  button {
-    background-color: #f9f9f9;
-  }
+}
+
+/* LAYER 2: Custom Utilities - Your brand colors */
+@layer utilities {
+  /* Font utilities */
+  .font-walmart { font-family: var(--font-family-walmart); }
+  .font-body { font-family: var(--font-family-body); }
+
+  /* Background colors */
+  .bg-true-blue { background-color: var(--color-true-blue); }
+  .bg-everyday-blue { background-color: var(--color-everyday-blue); }
+  .bg-sky-blue { background-color: var(--color-sky-blue); }
+  .bg-bentonville-blue { background-color: var(--color-bentonville-blue); }
+  .bg-spark-yellow { background-color: var(--color-spark-yellow); }
+  .bg-success { background-color: var(--color-success); }
+  .bg-warning { background-color: var(--color-warning); }
+  .bg-danger { background-color: var(--color-danger); }
+
+  /* Text colors */
+  .text-true-blue { color: var(--color-true-blue); }
+  .text-everyday-blue { color: var(--color-everyday-blue); }
+  .text-bentonville-blue { color: var(--color-bentonville-blue); }
+  .text-spark-yellow { color: var(--color-spark-yellow); }
 }

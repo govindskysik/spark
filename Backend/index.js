@@ -23,7 +23,7 @@ const start=async()=>{
         })
 
     } catch (error) {
-        console.llog(`Error connecting to the database: ${error.message}`);
+        console.log(`Error connecting to the database: ${error.message}`);
     }
 }
 
