@@ -1,14 +1,20 @@
 const zod=require('zod');
 const {StatusCodes}=require('http-status-codes')
-const {User}=require('../models/user');
+const User=require('../models/user');
 
-const userSchema=zod.object({
+const signinSchema=zod.object({
     email:zod.string().email(),
     password:zod.string().min(6)
 })
+const signupSchema=zod.object({
+    username:zod.string(),
+    email:zod.string().email(),
+    password:zod.string().min(6)
+})
+
 const signin=async(req,res)=>{
     try {
-        const isValid=userSchema.safeParse(req.body);
+        const isValid=signinSchema.safeParse(req.body);
         if(!isValid.success)
             return res.status(StatusCodes.BAD_REQUEST).json({msg:"invalid input data"})
         const user=await User.findOne({email:req.body.email});
@@ -27,7 +33,7 @@ const signin=async(req,res)=>{
 
 const signup=async(req,res)=>{
     try {
-        const isValid=userSchema.safeParse(req.body);
+        const isValid=signupSchema.safeParse(req.body);
         if(!isValid.success){
             return res.status(StatusCodes.BAD_REQUEST).json({msg:"invalid input data"});
         }
