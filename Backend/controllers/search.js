@@ -2,6 +2,22 @@ const Product=require('../models/product')
 const {StatusCodes}=require('http-status-codes');
 const mongoose=require('mongoose');
 
+const getAllCategories=async(req,res)=>{
+    try {
+        const categories=await Product.distinct('root_category_name')
+        return res.status(StatusCodes.OK).json({
+            success:true,
+            categories,
+            count: categories.length
+        })
+    } catch (error) {
+        console.log(`error in fetching all categories`);
+        return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+            success:false,
+            message:error.message
+        })  
+    }
+}
 const cateogorySearch=async(req,res)=>{
     try {
         const {category}=req.params;
@@ -118,4 +134,4 @@ const fuzzySearch=async(req,res)=>{
 
 }
 
-module.exports={cateogorySearch,idSearch,fuzzySearch};
+module.exports={cateogorySearch,idSearch,fuzzySearch,getAllCategories};
