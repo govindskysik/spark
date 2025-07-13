@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import Navbar from './components/layout/Navbar'
 import AppRouter from './routes/AppRouter'
 import SlidingMenu from './components/layout/SlidingMenu'
+import SparkButton from './components/ui/SparkButton'
 import useAuthStore from './store/authStore'
 import { Toaster } from 'react-hot-toast'
 
@@ -40,15 +41,14 @@ const App = () => {
         }}
       />
       
-      {/* Sliding Menu */}
       <SlidingMenu 
         isMenuOpen={isMenuOpen} 
         toggleMenu={toggleMenu} 
       />
       
-      {/* Main Content */}
+      {/* Fixed navbar that will also transform */}
       <div 
-        className={`min-h-screen transition-transform duration-500 ease-out ${
+        className={`fixed top-0 left-0 right-0 z-50 transition-transform duration-500 ease-out ${
           isMenuOpen ? 'transform translate-x-80' : 'transform translate-x-0'
         }`}
       >
@@ -56,10 +56,21 @@ const App = () => {
           isMenuOpen={isMenuOpen}
           toggleMenu={toggleMenu} 
         />
-        <main>
+      </div>
+      
+      {/* Main content that transforms and has padding for the navbar */}
+      <div 
+        className={`transition-transform duration-500 ease-out ${
+          isMenuOpen ? 'transform translate-x-80' : 'transform translate-x-0'
+        }`}
+      >
+        <main > 
           <AppRouter />
         </main>
       </div>
+      
+      {/* Spark Button - Fixed at bottom */}
+      <SparkButton />
     </div>
   )
 }

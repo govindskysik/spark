@@ -76,6 +76,7 @@ const idSearch=async(req,res)=>{
             success:true,
             product
         })
+        
     } catch (error) {
         console.log(`error fetching product by id :${productId}` )
         return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({message:"An error occurred while searching for the product"})

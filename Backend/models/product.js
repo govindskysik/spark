@@ -99,7 +99,7 @@ const ProductSchema = new Schema({
     default: []
   },
   customer_reviews: {
-    type: [Schema.Types.Mixed], // Array of objects
+    type: [Schema.Types.Mixed], 
     default: []
   },
   initial_price: {

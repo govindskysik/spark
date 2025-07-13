@@ -49,14 +49,19 @@ const useAuthStore = create((set, get) => ({
     set({ isLoading: true, error: null });
     try {
       const response = await authService.signin(credentials);
-      const { user, token } = response;
+      console.log('Raw auth response:', response); 
       
-      console.log('User data from server:', response);
+      const { user, token } = response;
+      console.log('Extracted user object:', user); 
+      console.log('Username from response:', user?.username); 
+      
       localStorage.setItem('token', token);
       localStorage.setItem('user', JSON.stringify(user));
-      console.log('Stored in localStorage:', JSON.stringify(user));
       
-      // Update store
+      // Check what was stored
+      const storedUser = JSON.parse(localStorage.getItem('user'));
+      console.log('User from localStorage after storing:', storedUser);
+      
       set({ 
         user, 
         token, 

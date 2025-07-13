@@ -33,13 +33,11 @@ const AuthModal = ({ isOpen, onClose }) => {
     defaultValues: formValues
   });
 
-  // Watch password for requirements validation
   const watchPassword = watch('password') || '';
 
   const onSubmit = async (data) => {
     console.log('Form submitted with data:', data);
     
-    // Remove confirmPassword from data before sending to backend
     const { confirmPassword, ...submitData } = data;
     
     clearError();
@@ -53,8 +51,6 @@ const AuthModal = ({ isOpen, onClose }) => {
         console.log('Attempting signin...');
         result = await signin(submitData);
       }
-
-      console.log('Auth result:', result);
 
       if (result.success) {
         toast.success(
@@ -103,105 +99,64 @@ const AuthModal = ({ isOpen, onClose }) => {
     onClose();
   };
 
-  // Animation variants
   const backdropVariants = {
-    closed: { 
-      opacity: 0,
-      backdropFilter: "blur(0px)"
-    },
-    open: { 
-      opacity: 1,
-      backdropFilter: "blur(8px)"
-    }
+    closed: { opacity: 0, backdropFilter: "blur(0px)" },
+    open: { opacity: 1, backdropFilter: "blur(8px)" }
   };
 
   const modalVariants = {
     closed: { 
-      opacity: 0, 
-      scale: 0.8, 
-      y: -50,
-      transition: {
-        type: "spring",
-        stiffness: 300,
-        damping: 30
-      }
+      opacity: 0, scale: 0.8, y: -50,
+      transition: { type: "spring", stiffness: 300, damping: 30 }
     },
     open: { 
-      opacity: 1, 
-      scale: 1, 
-      y: 0,
-      transition: {
-        type: "spring",
-        stiffness: 300,
-        damping: 30
-      }
+      opacity: 1, scale: 1, y: 0,
+      transition: { type: "spring", stiffness: 300, damping: 30 }
     }
   };
 
   const inputVariants = {
     focus: {
-      scale: 1.02,
+      scale: 1.01,
       borderColor: "#0053E2",
-      boxShadow: "0 0 0 3px rgba(0, 83, 226, 0.1)",
-      transition: {
-        type: "spring",
-        stiffness: 400,
-        damping: 20
-      }
+      boxShadow: "0 0 0 2px rgba(0, 83, 226, 0.1)",
     }
   };
 
   const buttonVariants = {
-    hover: {
-      scale: 1.02,
-      y: -2,
-      boxShadow: "0 10px 25px rgba(0, 83, 226, 0.3)",
-      transition: {
-        type: "spring",
-        stiffness: 400,
-        damping: 10
-      }
-    },
-    tap: {
-      scale: 0.98,
-      y: 0
-    }
+    hover: { scale: 1.01, y: -1 },
+    tap: { scale: 0.99, y: 0 }
   };
 
   return (
     <AnimatePresence>
       {isOpen && (
         <>
-          {/* Backdrop with Blur Effect - Higher Z-Index */}
           <motion.div
             variants={backdropVariants}
             initial="closed"
             animate="open"
             exit="closed"
-            className="fixed inset-0 bg-white/20 backdrop-blur-sm z-[9999] flex items-center justify-center p-4"
+            className="fixed inset-0 bg-white backdrop-blur-sm z-[9999] flex items-center justify-center p-3"
             onClick={handleClose}
             style={{
               backdropFilter: "blur(8px)",
               background: "rgba(255, 255, 255, 0.1)"
             }}
           >
-            {/* Modal - Even Higher Z-Index */}
             <motion.div
               variants={modalVariants}
               initial="closed"
               animate="open"
               exit="closed"
-              className="bg-white rounded-2xl p-8 w-full max-w-md mx-auto shadow-2xl relative z-[10000]"
+              className="bg-white rounded-lg p-5 w-full max-w-sm mx-auto shadow-xl relative z-[10000]"
               onClick={(e) => e.stopPropagation()}
-              style={{
-                boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(0, 0, 0, 0.05)"
-              }}
             >
               {/* Header */}
-              <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center justify-between mb-4">
                 <motion.h2 
-                  className="text-2xl font-walmart font-bold text-gray-800"
-                  initial={{ opacity: 0, x: -20 }}
+                  className="text-lg font-walmart font-bold text-gray-800"
+                  initial={{ opacity: 0, x: -10 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: 0.1 }}
                 >
@@ -209,16 +164,16 @@ const AuthModal = ({ isOpen, onClose }) => {
                 </motion.h2>
                 <motion.button
                   onClick={handleClose}
-                  className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                  className="p-1 hover:bg-gray-100 rounded-full transition-colors"
                   whileHover={{ scale: 1.1, rotate: 90 }}
                   whileTap={{ scale: 0.9 }}
                 >
-                  <X className="w-5 h-5 text-gray-500" />
+                  <X className="w-4 h-4 text-gray-500" />
                 </motion.button>
               </div>
 
               {/* Form */}
-              <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+              <form onSubmit={handleSubmit(onSubmit)} className="space-y-3">
                 {/* Username (Sign Up Only) */}
                 {isSignUp && (
                   <motion.div
@@ -227,15 +182,15 @@ const AuthModal = ({ isOpen, onClose }) => {
                     exit={{ opacity: 0, height: 0 }}
                     transition={{ duration: 0.3 }}
                   >
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-xs font-medium text-gray-700 mb-1">
                       Username
                     </label>
                     <div className="relative">
-                      <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                      <User className="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
                       <motion.input
                         {...register('username')}
                         type="text"
-                        className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all ${
+                        className={`w-full pl-8 pr-3 py-2 text-sm border rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-all ${
                           errors.username ? 'border-red-500' : 'border-gray-300'
                         }`}
                         placeholder="Enter your username"
@@ -245,8 +200,8 @@ const AuthModal = ({ isOpen, onClose }) => {
                     </div>
                     {errors.username && (
                       <motion.p 
-                        className="text-red-500 text-sm mt-1"
-                        initial={{ opacity: 0, y: -10 }}
+                        className="text-red-500 text-xs mt-0.5"
+                        initial={{ opacity: 0, y: -5 }}
                         animate={{ opacity: 1, y: 0 }}
                       >
                         {errors.username.message}
@@ -257,26 +212,25 @@ const AuthModal = ({ isOpen, onClose }) => {
 
                 {/* Email */}
                 <motion.div
-                  initial={{ opacity: 0, y: 20 }}
+                  initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.1 }}
                 >
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-xs font-medium text-gray-700 mb-1">
                     Email Address
                   </label>
                   <div className="relative">
-                    <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                    <Mail className="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
                     <motion.input
                       {...register('email')}
                       type="email"
-                      className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all ${
+                      className={`w-full pl-8 pr-3 py-2 text-sm border rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-all ${
                         errors.email ? 'border-red-500' : 'border-gray-300'
                       }`}
                       placeholder="Enter your email"
                       variants={inputVariants}
                       whileFocus="focus"
                       onChange={(e) => {
-                        // Update both form state and local state
                         setValue('email', e.target.value);
                         setFormValues(prev => ({ ...prev, email: e.target.value }));
                       }}
@@ -284,8 +238,8 @@ const AuthModal = ({ isOpen, onClose }) => {
                   </div>
                   {errors.email && (
                     <motion.p 
-                      className="text-red-500 text-sm mt-1"
-                      initial={{ opacity: 0, y: -10 }}
+                      className="text-red-500 text-xs mt-0.5"
+                      initial={{ opacity: 0, y: -5 }}
                       animate={{ opacity: 1, y: 0 }}
                     >
                       {errors.email.message}
@@ -295,26 +249,25 @@ const AuthModal = ({ isOpen, onClose }) => {
 
                 {/* Password */}
                 <motion.div
-                  initial={{ opacity: 0, y: 20 }}
+                  initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.2 }}
                 >
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-xs font-medium text-gray-700 mb-1">
                     Password
                   </label>
                   <div className="relative">
-                    <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                    <Lock className="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
                     <motion.input
                       {...register('password')}
                       type={showPassword ? 'text' : 'password'}
-                      className={`w-full pl-10 pr-12 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all ${
+                      className={`w-full pl-8 pr-8 py-2 text-sm border rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-all ${
                         errors.password ? 'border-red-500' : 'border-gray-300'
                       }`}
                       placeholder={isSignUp ? "Create a password" : "Enter your password"}
                       variants={inputVariants}
                       whileFocus="focus"
                       onChange={(e) => {
-                        // Update both form state and local state
                         setValue('password', e.target.value);
                         setFormValues(prev => ({ ...prev, password: e.target.value }));
                       }}
@@ -322,17 +275,17 @@ const AuthModal = ({ isOpen, onClose }) => {
                     <motion.button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+                      className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
                       whileHover={{ scale: 1.1 }}
                       whileTap={{ scale: 0.9 }}
                     >
-                      {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                      {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                     </motion.button>
                   </div>
                   {errors.password && (
                     <motion.p 
-                      className="text-red-500 text-sm mt-1"
-                      initial={{ opacity: 0, y: -10 }}
+                      className="text-red-500 text-xs mt-0.5"
+                      initial={{ opacity: 0, y: -5 }}
                       animate={{ opacity: 1, y: 0 }}
                     >
                       {errors.password.message}
@@ -346,10 +299,10 @@ const AuthModal = ({ isOpen, onClose }) => {
                     initial={{ opacity: 0, height: 0 }}
                     animate={{ opacity: 1, height: 'auto' }}
                     exit={{ opacity: 0, height: 0 }}
-                    className="text-xs text-gray-500 mt-1 space-y-1 bg-gray-50 p-3 rounded-lg"
+                    className="text-xs text-gray-500 mt-1 bg-gray-50 p-2 rounded-md"
                   >
-                    <p className="font-medium">Password must contain:</p>
-                    <ul className="list-disc pl-4 space-y-1">
+                    <p className="text-xs font-medium">Password must contain:</p>
+                    <ul className="list-disc pl-4 text-xs space-y-0.5 mt-0.5">
                       <li className={watchPassword.length >= 6 ? "text-green-500" : ""}>
                         At least 6 characters
                       </li>
@@ -374,15 +327,15 @@ const AuthModal = ({ isOpen, onClose }) => {
                     exit={{ opacity: 0, height: 0 }}
                     transition={{ duration: 0.3 }}
                   >
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-xs font-medium text-gray-700 mb-1">
                       Confirm Password
                     </label>
                     <div className="relative">
-                      <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                      <Lock className="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
                       <motion.input
                         {...register('confirmPassword')}
                         type={showConfirmPassword ? 'text' : 'password'}
-                        className={`w-full pl-10 pr-12 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all ${
+                        className={`w-full pl-8 pr-8 py-2 text-sm border rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-all ${
                           errors.confirmPassword ? 'border-red-500' : 'border-gray-300'
                         }`}
                         placeholder="Confirm your password"
@@ -392,17 +345,17 @@ const AuthModal = ({ isOpen, onClose }) => {
                       <motion.button
                         type="button"
                         onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                        className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+                        className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
                         whileHover={{ scale: 1.1 }}
                         whileTap={{ scale: 0.9 }}
                       >
-                        {showConfirmPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                        {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                       </motion.button>
                     </div>
                     {errors.confirmPassword && (
                       <motion.p 
-                        className="text-red-500 text-sm mt-1"
-                        initial={{ opacity: 0, y: -10 }}
+                        className="text-red-500 text-xs mt-0.5"
+                        initial={{ opacity: 0, y: -5 }}
                         animate={{ opacity: 1, y: 0 }}
                       >
                         {errors.confirmPassword.message}
@@ -414,12 +367,12 @@ const AuthModal = ({ isOpen, onClose }) => {
                 {/* Error Message */}
                 {error && (
                   <motion.div 
-                    className="bg-red-50 border border-red-200 rounded-lg p-3"
+                    className="bg-red-50 border border-red-200 rounded-md p-2"
                     initial={{ opacity: 0, scale: 0.9 }}
                     animate={{ opacity: 1, scale: 1 }}
                     exit={{ opacity: 0, scale: 0.9 }}
                   >
-                    <p className="text-red-600 text-sm">{error}</p>
+                    <p className="text-red-600 text-xs">{error}</p>
                   </motion.div>
                 )}
 
@@ -427,42 +380,34 @@ const AuthModal = ({ isOpen, onClose }) => {
                 <motion.button
                   type="submit"
                   disabled={isLoading || (isSignUp && !isValid)}
-                  className="w-full bg-blue-600 text-white py-3 rounded-lg font-medium hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+                  className="w-full bg-blue-600 text-white py-2 rounded-md text-sm font-medium hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center mt-2"
                   variants={buttonVariants}
                   whileHover={!isLoading && (isSignUp ? isValid : true) ? "hover" : {}}
                   whileTap={!isLoading && (isSignUp ? isValid : true) ? "tap" : {}}
                 >
                   {isLoading ? (
                     <>
-                      <Loader2 className="w-5 h-5 animate-spin mr-2" />
-                      {isSignUp ? 'Creating Account...' : 'Signing In...'}
+                      <Loader2 className="w-4 h-4 animate-spin mr-1" />
+                      <span className="text-sm">{isSignUp ? 'Creating Account...' : 'Signing In...'}</span>
                     </>
                   ) : (
-                    isSignUp ? 'Create Account' : 'Sign In'
+                    <span className="text-sm">{isSignUp ? 'Create Account' : 'Sign In'}</span>
                   )}
                 </motion.button>
-
-                {/* Debug info - remove in production */}
-                {/*
-                <div className="text-xs text-gray-400 mt-2">
-                  <p>Form valid: {isValid ? 'Yes' : 'No'}</p>
-                  <p>Errors: {Object.keys(errors).length > 0 ? JSON.stringify(Object.keys(errors)) : 'None'}</p>
-                </div>
-                */}
               </form>
 
               {/* Toggle Mode */}
               <motion.div 
-                className="mt-6 text-center"
+                className="mt-4 text-center"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.4 }}
               >
-                <p className="text-gray-600">
+                <p className="text-gray-600 text-xs">
                   {isSignUp ? 'Already have an account?' : "Don't have an account?"}{' '}
                   <motion.button
                     onClick={toggleMode}
-                    className="text-blue-600 hover:text-blue-700 font-medium transition-colors"
+                    className="text-blue-600 hover:text-blue-700 text-xs font-medium transition-colors"
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
                   >

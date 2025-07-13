@@ -1,5 +1,16 @@
 @import "tailwindcss";
 
+/* Hide scrollbar for Chrome, Safari and Opera */
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+/* Hide scrollbar for IE, Edge and Firefox */
+.scrollbar-hide {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+
 /* Everyday Sans Web Font Faces */
 @font-face {
   font-family: 'Everyday Sans Web';
@@ -100,4 +111,13 @@
   .text-everyday-blue { color: var(--color-everyday-blue); }
   .text-bentonville-blue { color: var(--color-bentonville-blue); }
   .text-spark-yellow { color: var(--color-spark-yellow); }
+}
+
+/* Custom scrollbar styles */
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
