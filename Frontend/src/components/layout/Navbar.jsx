@@ -15,6 +15,7 @@ import { useNavigate } from "react-router-dom";
 import useAuthStore from "../../store/authStore";
 import AuthModal from "../auth/AuthModal";
 import categoryService from "../../services/categoryService";
+import useCartStore from "../../store/useCartStore";
 
 const Navbar = ({ isMenuOpen, toggleMenu }) => {
   const navigate = useNavigate();
@@ -22,6 +23,13 @@ const Navbar = ({ isMenuOpen, toggleMenu }) => {
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [categories, setCategories] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const { products, fetchCart } = useCartStore();
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      fetchCart(); // fetch only if logged in
+    }
+  }, [isAuthenticated]);
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -106,7 +114,7 @@ const Navbar = ({ isMenuOpen, toggleMenu }) => {
           </div>
 
           {/* Search Bar */}
-          <div className="flex-1 mx-4 max-w-xl">
+          <div className="min-w-64">
             <div className="relative">
               <input
                 type="text"
@@ -146,9 +154,20 @@ const Navbar = ({ isMenuOpen, toggleMenu }) => {
               </button>
             )}
           </div>
-          <button className="flex items-center">
-            <ShoppingCart className="text-white w-6 h-6" />
-          </button>
+          <div className="relative">
+            <button
+              className="flex items-center"
+              onClick={() => navigate("/cart")}
+              aria-label="View Cart"
+            >
+              <ShoppingCart className="text-white w-6 h-6" />
+              {products.length > 0 && (
+                <span className="absolute -top-1 -right-2 bg-spark-yellow text-bentonville-blue text-[10px] flex items-center justify-center w-4 h-4 font-bold  rounded-full">
+                  {products.reduce((sum, item) => sum + item.quantity, 0)}
+                </span>
+              )}
+            </button>
+          </div>
         </div>
       </header>
 

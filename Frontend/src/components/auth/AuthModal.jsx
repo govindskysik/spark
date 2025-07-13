@@ -141,7 +141,11 @@ const AuthModal = ({ isOpen, onClose }) => {
             onClick={handleClose}
             style={{
               backdropFilter: "blur(8px)",
-              background: "rgba(255, 255, 255, 0.1)"
+              background: "rgba(255, 255, 255, 0.1)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              minHeight: "100vh" // Ensures vertical centering
             }}
           >
             <motion.div
@@ -151,6 +155,9 @@ const AuthModal = ({ isOpen, onClose }) => {
               exit="closed"
               className="bg-white rounded-lg p-5 w-full max-w-sm mx-auto shadow-xl relative z-[10000]"
               onClick={(e) => e.stopPropagation()}
+              style={{
+                margin: "auto" // Ensures horizontal centering
+              }}
             >
               {/* Header */}
               <div className="flex items-center justify-between mb-4">

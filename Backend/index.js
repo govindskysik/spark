@@ -6,7 +6,10 @@ const cors=require('cors')
 
 const userRouter=require('./routes/user')
 
-app.use(cors())
+app.use(cors({
+  origin: 'http://localhost:5173', // your frontend URL
+  credentials: true
+}));
 app.use(express.json());
 
 app.use('/user',userRouter);

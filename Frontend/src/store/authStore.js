@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import authService from '../services/authService';
 
+
 const useAuthStore = create((set, get) => ({
   user: null,
   token: null,
