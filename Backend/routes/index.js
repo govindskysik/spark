@@ -1,12 +1,14 @@
 const express = require('express');
 const router = express.Router();
 
-const userRouter = require('./user');
+// const userRouter = require('./user');
 const searchRouter = require('./search');
 const cartRouter = require('./cart');
 
-router.use('/user', userRouter);
+const auth=require('../middleware/auth')
+
+// router.use('/user', userRouter);
 router.use('/search', searchRouter);    
-router.use('/cart', cartRouter);
+router.use('/cart',auth,cartRouter);
 
 module.exports = router;

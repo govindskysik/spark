@@ -11,6 +11,7 @@ const ProductSchema = new Schema({
     required: true,
     trim: true
   },
+  quantity: { type: Number, default: 0 },
   final_price: {
     type: Number,
     required: true,

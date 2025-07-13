@@ -25,7 +25,11 @@ const signin=async(req,res)=>{
             return res.status(StatusCodes.UNAUTHORIZED).json({msg:"invalid credentials"})
         }
         const token=await user.createjwt();
-        return res.status(StatusCodes.OK).json({user,token});
+        return res.status(StatusCodes.OK).json({user:{
+            username:user.username,
+            email:user.email
+        },token});
+
     } catch (error) {
         return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({msg:"internal server error",error:error.message});
     }
@@ -43,8 +47,12 @@ const signup=async(req,res)=>{
         }
         const user=await User.create(req.body);
         const token=await user.createjwt();
-        return res.status(StatusCodes.CREATED).json({user,token});
+        return res.status(StatusCodes.CREATED).json({user:{
+            username:user.username,
+            email:user.email
+        },token});
     } catch (error) {
+        console.log(error)
         return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({msg:"internal server error",error:error.message});
     }
 }
