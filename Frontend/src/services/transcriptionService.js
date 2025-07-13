@@ -1,5 +1,3 @@
-// services/transcriptionService.js
-
 import axios from 'axios';
 import API_CONFIG from '../config/api';
 
@@ -30,7 +28,7 @@ const transcriptionService = {
     try {
       const response = await apiClient.post("/app/tts", { text }, { responseType: "blob" });
       const blob = new Blob([response.data], { type: "audio/mpeg" });
-      return URL.createObjectURL(blob); // usable by <audio src=... />
+      return URL.createObjectURL(blob); 
     } catch (error) {
       console.error("TTS request failed:", error);
       return null;

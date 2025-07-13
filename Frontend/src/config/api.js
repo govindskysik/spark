@@ -1,5 +1,6 @@
 const API_CONFIG = {
-  BASE_URL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000',
+  BASE_URL: import.meta.env.VITE_API_BASE_URL ,
+  BASE_URL_AGENT: import.meta.env.VITE_API_BASE_URL_AGENT,
 
   ENDPOINTS: {
     SEARCH: {
@@ -20,10 +21,10 @@ const API_CONFIG = {
       UPDATE: '/app/cart',
       CLEAR: '/app/cart/clearCart',
     }
-  }
-  ,
+  },
 
-  buildUrl: (endpoint) => `${API_CONFIG.BASE_URL}${endpoint}`
+  buildUrl: (endpoint) => `${API_CONFIG.BASE_URL}${endpoint}`,
+  buildUrlAgent: (endpoint) => `${API_CONFIG.BASE_URL_AGENT}${endpoint}`
 };
 
 export default API_CONFIG;

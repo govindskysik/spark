@@ -1,7 +1,8 @@
 import axios from 'axios';
+import API_CONFIG from '../config/api';
 
 const agentClient = axios.create({
-  baseURL: 'https://sparky-ai.onrender.com',
+  baseURL: API_CONFIG.BASE_URL_AGENT,
   timeout: 100000,
 });
 

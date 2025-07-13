@@ -110,7 +110,7 @@ const SparkModal = ({ toggleSpark }) => {
         const productIds = extractProductIds(rawResponse);
         const cleanText = formatAgentMessage(rawResponse);
 
-        // Send TTS request
+  
         const audioUrl = await transcriptionService.getSpeechFromText(
           cleanText
         );
