@@ -26,7 +26,7 @@ const addToCart = async (req, res) => {
     const { userId } = req.user;
     console.log("Request Body:", req.body);
     const { quantity, productId, size, color } = req.body;
-    console.log("User ID:", userId);
+    // console.log("User ID:", productId);
     const product = await Product.findById(productId)
       .select('final_price sizes colors available_for_delivery quantity')
       .session(session);
@@ -75,10 +75,11 @@ const addToCart = async (req, res) => {
 
     if (!cart) {
       cart = await Cart.create([{
-        userId,
+        userId:userId,
         products: [{ productId, quantity, size, color }],
         total_price: product_price
-      }], { session });
+      }],{session});
+      console.log('hello after cart')
       cart = cart[0];
     } else {
       const index = cart.products.findIndex(item =>

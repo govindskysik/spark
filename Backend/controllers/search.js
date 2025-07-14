@@ -57,15 +57,8 @@ const cateogorySearch=async(req,res)=>{
 }
 const idSearch=async(req,res)=>{
     const productId=req.params.id;
-    try {
-        // if(!mongoose.Types.ObjectId.isValid(productId)){
-        //     return res.status(StatusCodes.BAD_REQUEST).json({
-        //         success:false,
-        //         message:"Invalid product ID format"
-        //     });
-        // }
-
-        const product=await Product.findById(productId);
+    try {  
+      const product=await Product.findById(productId);
         if(!product){
             return res.status(StatusCodes.NOT_FOUND).json({
                 success:false,
