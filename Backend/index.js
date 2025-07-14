@@ -7,7 +7,7 @@ const cors=require('cors')
 const userRouter=require('./routes/user')
 
 app.use(cors({
-  origin:['http://localhost:5173','https://spark-seven-chi.vercel.app/'], // your frontend URL
+  origin:['http://localhost:5173','https://spark-seven-chi.vercel.app'], // your frontend URL
   credentials: true
 }));
 app.use(express.json());
