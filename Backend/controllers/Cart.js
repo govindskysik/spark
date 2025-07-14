@@ -4,6 +4,21 @@ const Product=require('../models/product')
 const {StatusCodes}=require('http-status-codes')
 const mongoose=require('mongoose')
 
+async function processProducts(cart, session) {
+  let products = [];
+  for (const pro of cart.products) {
+    const embeddings = await Product.findById(pro.productId)
+      .select('embedding embedding_text')
+      .session(session);
+    products.push({
+      pro,
+      embedding: embeddings ? embeddings.embedding : null,
+      embedding_text: embeddings ? embeddings.embedding_text : null,
+    });
+  }
+  return products;
+}
+
 const addToCart = async (req, res) => {
   const session = await mongoose.startSession();
   session.startTransaction();
@@ -14,12 +29,20 @@ const addToCart = async (req, res) => {
       .select('final_price sizes colors available_for_delivery quantity')
       .session(session);
 
-    if (!product || !product.available_for_delivery || quantity > product.quantity) {
+    if (!product  || quantity > product.quantity) {
       await session.abortTransaction();
       session.endSession();
       return res.status(StatusCodes.BAD_REQUEST).json({
         success: false,
         message: "product not available"
+      });
+    }
+    if( !product.available_for_delivery){
+      await session.abortTransaction();
+      session.endSession();
+      return res.status(StatusCodes.BAD_REQUEST).json({
+        success: false,
+        message: "product not available for delivery"
       });
     }
     if ((size && !product.sizes.includes(size)) || (color && !product.colors.includes(color))) {
@@ -60,6 +83,7 @@ const addToCart = async (req, res) => {
     session.endSession();
     return res.status(StatusCodes.OK).json({
       success: true,
+      message:"product found and added to cart",
       data: {
         products: cart.products,
         total_price: cart.total_price
@@ -114,6 +138,18 @@ const removeFromCart = async (req, res) => {
 
     await cart.save({ session });
 
+    // async function processProducts(cart){
+    //   let products=[]
+    //   for(const pro of cart.products){
+    //     const embeddings=await Product.findById(pro.productId).select('embedding embedding_text').session(session)
+    //     products.push({
+    //       pro,
+    //       embedding:embeddings.embedding,
+    //       embedding_text:embeddings.embedding_text,
+    //     })
+    //   }
+    // }
+    const productsWithEmbedding=await processProducts(cart,session)
     await session.commitTransaction();
     session.endSession();
 
@@ -121,7 +157,7 @@ const removeFromCart = async (req, res) => {
       success: true,
       message: "Product removed from cart",
       data: {
-        products: cart.products,
+        products: productsWithEmbedding,
         total_price: cart.total_price
       }
     });
@@ -210,6 +246,7 @@ const updateCartItem = async (req, res) => {
     cart.total_price += product.final_price;
 
     await cart.save({ session });
+        const productsWithEmbedding=await processProducts(cart,session)
 
     await session.commitTransaction();
     session.endSession();
@@ -218,7 +255,7 @@ const updateCartItem = async (req, res) => {
       success: true,
       message: "Cart item quantity incremented by one",
       data: {
-        products: cart.products,
+        products: productsWithEmbedding,
         total_price: cart.total_price
       }
     });
@@ -297,10 +334,24 @@ const viewCart=async(req,res)=>{
                 }
             })
         }
+        // async function ProcessProducts(cart){
+        //   let products=[];
+        //   for(const pro of cart.products) {
+        //     const embeddings=await Product.findById(pro.productId).select('embedding embedding_text')
+        //     products.push({
+        //       pro,
+        //       embedding:embeddings.embedding,
+        //       embedding_text:embeddings.embedding_text,
+        //     })
+        //   }
+        //   return products
+        // }
+        const productsWithEmbedding=await processProducts(cart)
+        // console.log(productsWithEmbedding)
         return res.status(StatusCodes.OK).json({
             success:true,
             data:{
-                products:cart.products,
+                products:productsWithEmbedding,
                 total_price:cart.total_price
             }
         })

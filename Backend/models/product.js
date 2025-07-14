@@ -114,6 +114,12 @@ const ProductSchema = new Schema({
   ingredients_full: {
     type: [String],
     default: []
+  },
+  embedding_text:{
+    type:String
+  },
+  embedding:{
+    type:[Number]
   }
 }, {
   timestamps: true
