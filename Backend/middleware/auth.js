@@ -8,13 +8,9 @@ const auth = async (req, res, next) => {
     }
 
     try {
-        const token = authHeader.split(" ")[1]
-        const payload = jwt.verify(token, process.env.JWT_SECRET)
-        // if(!payload){}
-        console.log(token)
-        console.log(payload)
-        req.user = { userId: payload.userId };
-        console.log("Authenticated user ID:", req.user.userId);
+        const token=authHeader.split(" ")[1]
+        const payload=jwt.verify(token,process.env.JWT_SECRET)
+        req.user={userId:payload.userId};
         next();
     } catch (error) {
         console.log(`error in authentication function :- ${error.message}`)
