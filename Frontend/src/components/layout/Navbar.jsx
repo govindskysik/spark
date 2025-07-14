@@ -17,7 +17,7 @@ import AuthModal from "../auth/AuthModal";
 import categoryService from "../../services/categoryService";
 import useCartStore from "../../store/useCartStore";
 
-const Navbar = ({ isMenuOpen, toggleMenu }) => {
+const Navbar = ({ isMenuOpen, toggleMenu, openAuthModal }) => {
   const navigate = useNavigate();
   const { user, isAuthenticated, logout } = useAuthStore();
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
@@ -27,7 +27,7 @@ const Navbar = ({ isMenuOpen, toggleMenu }) => {
 
   useEffect(() => {
     if (isAuthenticated) {
-      fetchCart(); // fetch only if logged in
+      fetchCart(); 
     }
   }, [isAuthenticated]);
 
@@ -47,11 +47,11 @@ const Navbar = ({ isMenuOpen, toggleMenu }) => {
     fetchCategories();
   }, []);
 
-  const handleAuthClick = () => {
+    const handleAuthClick = () => {
     if (isAuthenticated) {
-      setIsAuthModalOpen(false);
+      navigate("/"); 
     } else {
-      setIsAuthModalOpen(true);
+      openAuthModal(); 
     }
   };
 
