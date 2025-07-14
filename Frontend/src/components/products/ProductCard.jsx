@@ -1,6 +1,41 @@
-import React from "react";
+import React, { useRef, useEffect, useState } from "react";
 import { Star } from "lucide-react";
 import { Link } from "react-router-dom";
+
+// Lazy image component
+const LazyImage = ({ src, alt, ...props }) => {
+  const imgRef = useRef();
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    const observer = new window.IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) setVisible(true);
+        });
+      },
+      { threshold: 0.1 }
+    );
+    if (imgRef.current) observer.observe(imgRef.current);
+    return () => {
+      if (imgRef.current) observer.unobserve(imgRef.current);
+    };
+  }, []);
+
+  return (
+    <img
+      ref={imgRef}
+      src={visible ? src : undefined}
+      alt={alt}
+      {...props}
+      loading="lazy"
+      style={{ background: "#f3f4f6" }}
+      onError={(e) => {
+        e.target.src = "https://via.placeholder.com/300x300?text=No+Image";
+      }}
+    />
+  );
+};
 
 const ProductCard = ({ product }) => {
   if (!product) {
@@ -31,7 +66,6 @@ const ProductCard = ({ product }) => {
     return (weightedSum / totalRatings).toFixed(1);
   };
 
-  // Display price exactly as it comes from backend
   const formatPrice = (price) => {
     if (price === undefined || price === null) {
       return "N/A";
@@ -43,17 +77,13 @@ const ProductCard = ({ product }) => {
     <Link to={`/product/${product._id}`} className="block h-full">
       <div className="flex flex-col border border-gray-200 rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow duration-300 h-full">
         <div className="h-40 overflow-hidden">
-          <img
+          <LazyImage
             src={
               (product.image_urls && product.image_urls[0]) ||
               "https://via.placeholder.com/300x300?text=No+Image"
             }
             alt={product.product_name || "Product"}
             className="w-full h-full object-contain"
-            onError={(e) => {
-              console.log("Image failed to load, using placeholder");
-              e.target.src = "https://via.placeholder.com/300x300?text=No+Image";
-            }}
           />
         </div>
 

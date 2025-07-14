@@ -1,12 +1,18 @@
 import React, { useEffect, useRef, useState } from "react";
-import { ShoppingCart, LogOut, User as UserIcon, Store, Loader2 } from "lucide-react";
+import {
+  ShoppingCart,
+  LogOut,
+  User as UserIcon,
+  Store,
+  Loader2,
+} from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { assets } from "../../assets/assets";
 import useAuthStore from "../../store/authStore";
 import categoryService from "../../services/categoryService";
 import { Link, useNavigate } from "react-router-dom";
 
-const SlidingMenu = ({ isMenuOpen, toggleMenu }) => {
+const SlidingMenu = ({ isMenuOpen, toggleMenu, openAuthModal }) => {
   const menuRef = useRef(null);
   const navigate = useNavigate();
   const [categories, setCategories] = useState([]);
@@ -34,7 +40,6 @@ const SlidingMenu = ({ isMenuOpen, toggleMenu }) => {
 
   useEffect(() => {
     const handleClickOutside = (event) => {
-
       if (menuRef.current && !menuRef.current.contains(event.target)) {
         toggleMenu();
       }
@@ -51,11 +56,9 @@ const SlidingMenu = ({ isMenuOpen, toggleMenu }) => {
 
   const handleAuthClick = () => {
     if (isAuthenticated) {
-      // Navigate to account details page when available
-      console.log("Navigate to account page");
     } else {
-      toggleMenu(); // Close menu
-      navigate("/signin"); // Navigate to sign in page
+      toggleMenu();
+      openAuthModal();
     }
   };
 
@@ -274,7 +277,9 @@ const SlidingMenu = ({ isMenuOpen, toggleMenu }) => {
                         alt="Close Menu"
                       />
                     </motion.button>
-                    <span className="text-3xl text-bentonville-blue font-medium">Walmart</span>
+                    <span className="text-3xl text-bentonville-blue font-medium">
+                      Walmart
+                    </span>
                   </motion.div>
 
                   {/* User Profile Section */}
@@ -364,20 +369,23 @@ const SlidingMenu = ({ isMenuOpen, toggleMenu }) => {
                   />
 
                   {/* Categories - Updated for full height */}
-                  <motion.div className="flex flex-col flex-1 min-h-0" variants={itemVariants}>
+                  <motion.div
+                    className="flex flex-col flex-1 min-h-0"
+                    variants={itemVariants}
+                  >
                     <motion.h3
                       className="font-walmart font-bold text-gray-800 text-lg mb-4"
                       variants={titleVariants}
                     >
                       Categories
                     </motion.h3>
-                    
+
                     {/* Scrollable Categories List - Hidden scrollbar */}
-                    <motion.div 
+                    <motion.div
                       className="flex-1 overflow-y-auto pr-4 -mr-2"
                       style={{
-                        msOverflowStyle: 'none', /* IE and Edge */
-                        scrollbarWidth: 'none',  /* Firefox */
+                        msOverflowStyle: "none" /* IE and Edge */,
+                        scrollbarWidth: "none" /* Firefox */,
                       }}
                     >
                       <style>{`
@@ -385,7 +393,7 @@ const SlidingMenu = ({ isMenuOpen, toggleMenu }) => {
                           display: none;
                         }
                       `}</style>
-                      
+
                       {loadingCategories ? (
                         <div className="flex justify-center items-center py-8">
                           <Loader2 className="w-6 h-6 text-true-blue animate-spin" />
@@ -425,7 +433,10 @@ const SlidingMenu = ({ isMenuOpen, toggleMenu }) => {
                                 toggleMenu();
                               }}
                             >
-                              <Link to={`/products/category/${category}`} className="block w-full h-full">
+                              <Link
+                                to={`/products/category/${category}`}
+                                className="block w-full h-full"
+                              >
                                 <motion.span
                                   initial={{ opacity: 0 }}
                                   animate={{ opacity: 1 }}

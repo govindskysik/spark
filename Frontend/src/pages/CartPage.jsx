@@ -1,8 +1,16 @@
 import React, { useEffect, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import {
+  Truck,
+  Gift,
+  XCircle,
+  CheckCircle,
+  ShoppingCart,
+} from "lucide-react";
+
 import useCartStore from "../store/useCartStore";
 import productService from "../services/productService";
-import { Link } from "react-router-dom";
-import { Truck, Gift, XCircle, CheckCircle } from "lucide-react";
+import categoryService from "../services/categoryService";
 
 const CartPage = () => {
   const { products, totalPrice, fetchCart, removeItem, updateItem, clearCart } =
@@ -10,12 +18,14 @@ const CartPage = () => {
   const [productImages, setProductImages] = useState({});
   const [productNames, setProductNames] = useState({});
   const [recommended, setRecommended] = useState([]);
+  const [allCategories, setAllCategories] = useState([]);
+  const [randomCategories, setRandomCategories] = useState([]);
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetchCart();
   }, []);
 
-  // Fetch images and names for products in cart
   useEffect(() => {
     const fetchDetails = async () => {
       const imagesMap = {};
@@ -25,12 +35,10 @@ const CartPage = () => {
           try {
             const res = await productService.getProductById(p.productId);
             if (res && res.product) {
-              namesMap[p.productId] =
-                res.product.name || `Product ${p.productId}`;
+              namesMap[p.productId] = res.product.name || `Product ${p.productId}`;
               imagesMap[p.productId] =
-                res.product.image_urls && res.product.image_urls.length > 0
-                  ? res.product.image_urls[0]
-                  : "/src/assets/pictures/placeholder.png";
+                res.product.image_urls?.[0] ||
+                "/src/assets/pictures/placeholder.png";
             } else {
               namesMap[p.productId] = `Product ${p.productId}`;
               imagesMap[p.productId] = "/src/assets/pictures/placeholder.png";
@@ -59,183 +67,200 @@ const CartPage = () => {
     fetchRecommended();
   }, []);
 
+  useEffect(() => {
+    // Fetch all categories once
+    const fetchCategories = async () => {
+      const cats = await categoryService.getAllCategories();
+      setAllCategories(cats || []);
+    };
+    fetchCategories();
+  }, []);
+
+  useEffect(() => {
+    // Pick 4 random categories whenever allCategories changes
+    if (allCategories.length > 0) {
+      const shuffled = [...allCategories].sort(() => 0.5 - Math.random());
+      setRandomCategories(shuffled.slice(0, 4));
+    }
+  }, [allCategories]);
+
   const estimatedShipping = totalPrice >= 53 ? 0 : 6.99;
   const estimatedTotal = totalPrice + estimatedShipping;
   const savings = 7.01;
 
+  // ❗️Only show empty cart view when cart is empty
+  if (products.length === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen px-4 text-center bg-white">
+        <div className="relative mb-6 animate-bounce">
+          <ShoppingCart className="w-20 h-20 text-true-blue" />
+          <div className="absolute top-0 left-3 w-2 h-2 bg-blue-300 rounded-full animate-ping" />
+          <div className="absolute top-1 right-3 w-2 h-2 bg-blue-400 rounded-full animate-ping delay-200" />
+          <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-2 h-2 bg-blue-500 rounded-full animate-ping delay-300" />
+        </div>
+        <h2 className="text-xl font-bold text-gray-800">
+          Time to start shopping!
+        </h2>
+        <p className="text-sm text-gray-700 font-medium mt-2 mb-4">
+          Your cart is empty
+        </p>
+        <p className="text-sm text-gray-500 mb-6">
+          Fill it up with savings from these popular departments.
+        </p>
+        <div className="flex flex-wrap justify-center gap-3">
+          {randomCategories.map((cat) => (
+            <button
+              key={cat}
+              onClick={() => navigate(`/products/category/${cat}`)}
+              className="px-4 py-1.5 border border-gray-300 rounded-full text-sm hover:bg-gray-100 transition"
+            >
+              {`Shop ${cat.charAt(0).toUpperCase() + cat.slice(1)}`}
+            </button>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="pt-34 px-4 lg:px-8 bg-white min-h-screen ">
+    <div className="pt-34 px-4 lg:px-8 bg-white min-h-screen">
       <div className="max-w-7xl grid grid-cols-1 lg:grid-cols-3 gap-8">
+        {/* Left: Cart Items */}
         <div className="col-span-1 lg:col-span-2 flex flex-col gap-4">
           <div className="text-sm text-bentonville-blue font-medium">
-            <span className="text-lg font-semibold">Cart </span>(
-            {products.length} {products.length === 1 ? "item" : "items"})
+            <span className="text-lg font-semibold">Cart </span>({products.length}{" "}
+            {products.length === 1 ? "item" : "items"})
           </div>
           <div className="bg-true-blue/5 border border-bentonville-blue/20 rounded-lg shadow-xl p-4 mb-2">
-            <div>
-              <div className="flex items-center gap-3 mb-2">
-                <Truck className="w-6 h-6 bg-sky-blue text-true-blue" />
-                <span className="font-semibold text-base text-bentonville-blue">
-                  Shipping, arrives tomorrow, Jul 14
-                </span>
-              </div>
-              <span className="text-xs text-gray-500">
-                Order within <span className="font-bold">6 hr 42 min</span>
-              </span>
-              <span className="block text-xs text-gray-500 mt-1">
-                Free shipping on orders over $35
+            <div className="flex items-center gap-3 mb-2">
+              <Truck className="w-6 h-6 bg-sky-blue text-true-blue" />
+              <span className="font-semibold text-base text-bentonville-blue">
+                Shipping, arrives tomorrow, Jul 14
               </span>
             </div>
+            <span className="text-xs text-gray-500">
+              Order within <span className="font-bold">6 hr 42 min</span>
+            </span>
+            <span className="block text-xs text-gray-500 mt-1">
+              Free shipping on orders over $35
+            </span>
 
-            {/* Cart Items */}
-            {products.length === 0 ? (
-              <div className="flex flex-col items-center justify-center py-16 bg-white rounded-lg shadow">
-                <img
-                  src="/src/assets/pictures/empty-cart.png"
-                  alt="Empty Cart"
-                  className="w-32 h-32 mb-4 opacity-80"
-                />
-                <p className="text-lg text-gray-500 font-medium">
-                  Your cart is empty.
-                </p>
-                <Link
-                  to="/"
-                  className="mt-4 px-4 py-2 bg-true-blue text-white rounded hover:bg-blue-700 text-sm font-semibold"
-                >
-                  Shop Now
-                </Link>
-              </div>
-            ) : (
-              products.map((p, i) => (
-                <div
-                  key={i}
-                  className="bg-white p-4 rounded-lg shadow flex flex-col md:flex-row items-start md:items-center justify-between gap-6 border border-gray-100 text-sm"
-                >
-                  <div className="flex items-center gap-4 w-full">
-                    <img
-                      src={
-                        productImages[p.productId] ||
-                        "/src/assets/pictures/placeholder.png"
-                      }
-                      alt={productNames[p.productId]}
-                      className="w-20 h-20 object-cover rounded border border-gray-200"
-                    />
-                    <div className="flex-1">
-                      <h3 className="font-semibold text-bentonville-blue text-base mb-1">
-                        {productNames[p.productId]}
-                      </h3>
-                      <div className="flex gap-4 text-xs text-gray-600 mb-2">
-                        <span>
-                          Size:{" "}
-                          <span className="font-bold">{p.size || "-"}</span>
-                        </span>
-                        <span>
-                          Color:{" "}
-                          <span className="font-bold">{p.color || "-"}</span>
-                        </span>
-                      </div>
-                      <div className="flex gap-2 items-center text-xs mb-2">
-                        <Gift className="w-4 h-4 text-yellow-500" />
-                        <span>Gift Eligible</span>
-                        <span className="ml-2 font-bold text-green-600">
-                          Free 90-day returns
-                        </span>
-                      </div>
-                      <div className="flex gap-2 items-center text-xs">
-                        <span className="bg-blue-100 text-blue-800 px-2 py-0.5 rounded font-semibold">
-                          Deal
-                        </span>
-                        <span className="text-gray-500">
-                          Sold and shipped by{" "}
-                          <span className="font-bold text-gray-700">
-                            Walmart
-                          </span>
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="flex flex-col items-end gap-2 min-w-[120px]">
-                    <div className="flex gap-2 items-center">
-                      <button
-                        onClick={() =>
-                          removeItem({
-                            productId: p.productId,
-                            size: p.size,
-                            color: p.color,
-                          })
-                        }
-                        className="px-2 py-1 bg-red-500 text-white rounded text-base font-bold hover:bg-red-600 transition"
-                        title="Remove"
-                      >
-                        -
-                      </button>
-                      <span className="font-semibold text-base">
-                        {p.quantity}
+            {/* Cart items list */}
+            {products.map((p, i) => (
+              <div
+                key={i}
+                className="bg-white p-4 rounded-lg shadow flex flex-col md:flex-row items-start md:items-center justify-between gap-6 border border-gray-100 text-sm mt-4"
+              >
+                <div className="flex items-center gap-4 w-full">
+                  <img
+                    src={productImages[p.productId]}
+                    alt={productNames[p.productId]}
+                    className="w-20 h-20 object-cover rounded border border-gray-200"
+                  />
+                  <div className="flex-1">
+                    <h3 className="font-semibold text-bentonville-blue text-base mb-1">
+                      {productNames[p.productId]}
+                    </h3>
+                    <div className="flex gap-4 text-xs text-gray-600 mb-2">
+                      <span>
+                        Size: <span className="font-bold">{p.size || "-"}</span>
                       </span>
-                      <button
-                        onClick={() =>
-                          updateItem({
-                            productId: p.productId,
-                            size: p.size,
-                            color: p.color,
-                          })
-                        }
-                        className="px-2 py-1 bg-true-blue text-white rounded text-base font-bold hover:bg-blue-700 transition"
-                        title="Add"
-                      >
-                        +
-                      </button>
-                    </div>
-                    <div className="text-right mt-2">
-                      <span className="text-green-600 font-bold text-base">
-                        {p.price !== undefined
-                          ? `$${Number(p.price).toFixed(2)}`
-                          : "N/A"}
+                      <span>
+                        Color: <span className="font-bold">{p.color || "-"}</span>
                       </span>
-                      {p.initial_price && p.initial_price > p.price && (
-                        <span className="line-through text-gray-400 ml-2">
-                          ${Number(p.initial_price).toFixed(2)}
-                        </span>
-                      )}
-                      {p.initial_price && p.initial_price > p.price && (
-                        <div className="text-xs text-green-700 mt-1">
-                          You save $
-                          {Number(p.initial_price - p.price).toFixed(2)}
-                        </div>
-                      )}
                     </div>
-                    <div className="flex gap-2 mt-2">
-                      <button
-                        className="text-xs text-gray-500 underline hover:text-red-600"
-                        onClick={() =>
-                          removeItem({
-                            productId: p.productId,
-                            size: p.size,
-                            color: p.color,
-                          })
-                        }
-                      >
-                        Remove
-                      </button>
-                      <button className="text-xs text-gray-500 underline hover:text-true-blue">
-                        Save for later
-                      </button>
+                    <div className="flex gap-2 items-center text-xs mb-2">
+                      <Gift className="w-4 h-4 text-yellow-500" />
+                      <span>Gift Eligible</span>
+                      <span className="ml-2 font-bold text-green-600">
+                        Free 90-day returns
+                      </span>
+                    </div>
+                    <div className="flex gap-2 items-center text-xs">
+                      <span className="bg-blue-100 text-blue-800 px-2 py-0.5 rounded font-semibold">
+                        Deal
+                      </span>
+                      <span className="text-gray-500">
+                        Sold and shipped by{" "}
+                        <span className="font-bold text-gray-700">Walmart</span>
+                      </span>
                     </div>
                   </div>
                 </div>
-              ))
-            )}
+                <div className="flex flex-col items-end gap-2 min-w-[120px]">
+                  <div className="flex gap-2 items-center">
+                    <button
+                      onClick={() =>
+                        removeItem({
+                          productId: p.productId,
+                          size: p.size,
+                          color: p.color,
+                        })
+                      }
+                      className="px-2 py-1 bg-red-500 text-white rounded text-base font-bold hover:bg-red-600 transition"
+                    >
+                      -
+                    </button>
+                    <span className="font-semibold text-base">{p.quantity}</span>
+                    <button
+                      onClick={() =>
+                        updateItem({
+                          productId: p.productId,
+                          size: p.size,
+                          color: p.color,
+                        })
+                      }
+                      className="px-2 py-1 bg-true-blue text-white rounded text-base font-bold hover:bg-blue-700 transition"
+                    >
+                      +
+                    </button>
+                  </div>
+                  <div className="text-right mt-2">
+                    <span className="text-green-600 font-bold text-base">
+                      {p.price !== undefined
+                        ? `$${Number(p.price).toFixed(2)}`
+                        : "N/A"}
+                    </span>
+                    {p.initial_price && p.initial_price > p.price && (
+                      <>
+                        <span className="line-through text-gray-400 ml-2">
+                          ${Number(p.initial_price).toFixed(2)}
+                        </span>
+                        <div className="text-xs text-green-700 mt-1">
+                          You save ${Number(p.initial_price - p.price).toFixed(2)}
+                        </div>
+                      </>
+                    )}
+                  </div>
+                  <div className="flex gap-2 mt-2">
+                    <button
+                      className="text-xs text-gray-500 underline hover:text-red-600"
+                      onClick={() =>
+                        removeItem({
+                          productId: p.productId,
+                          size: p.size,
+                          color: p.color,
+                        })
+                      }
+                    >
+                      Remove
+                    </button>
+                    <button className="text-xs text-gray-500 underline hover:text-true-blue">
+                      Save for later
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
 
-        {/* Right Section: Summary & Recommendations */}
+        {/* Right: Summary & Recommendations */}
         <div className="flex flex-col gap-8">
-          {/* Summary */}
           <div className="bg-white p-6 rounded-lg shadow-md sticky top-24 border border-gray-100">
             <button className="bg-true-blue text-white font-bold text-center w-full py-3 rounded-lg hover:bg-blue-700 text-lg mb-4 transition">
               Continue to checkout
             </button>
-
             <div className="bg-blue-100 text-sm p-3 rounded flex items-center gap-2 mb-4">
               <CheckCircle className="w-5 h-5 text-true-blue" />
               <div>
@@ -248,7 +273,6 @@ const CartPage = () => {
                 <XCircle className="w-4 h-4" />
               </button>
             </div>
-
             <div className="mt-2 border-t pt-4 space-y-3 text-sm text-gray-700">
               <div className="flex justify-between">
                 <span>
@@ -256,34 +280,20 @@ const CartPage = () => {
                   {products.length !== 1 ? "s" : ""})
                 </span>
                 <span className="line-through text-gray-400">
-                  {totalPrice !== undefined
-                    ? `$${Number(totalPrice + savings).toFixed(2)}`
-                    : "N/A"}
+                  ${Number(totalPrice + savings).toFixed(2)}
                 </span>
               </div>
               <div className="flex justify-between text-green-600 font-bold">
                 <span>Savings</span>
-                <span>
-                  {savings !== undefined
-                    ? `-$${Number(savings).toFixed(2)}`
-                    : "N/A"}
-                </span>
+                <span>-${Number(savings).toFixed(2)}</span>
               </div>
               <div className="flex justify-between font-semibold text-black">
                 <span>Price after savings</span>
-                <span>
-                  {totalPrice !== undefined
-                    ? `$${Number(totalPrice).toFixed(2)}`
-                    : "N/A"}
-                </span>
+                <span>${Number(totalPrice).toFixed(2)}</span>
               </div>
               <div className="flex justify-between text-gray-500">
                 <span>Delivery</span>
-                <span>
-                  {estimatedShipping > 0
-                    ? `$${Number(estimatedShipping).toFixed(2)}`
-                    : "Free"}
-                </span>
+                <span>{estimatedShipping > 0 ? `$${estimatedShipping}` : "Free"}</span>
               </div>
               <div className="flex justify-between font-medium text-black">
                 <span>Taxes</span>
@@ -291,59 +301,46 @@ const CartPage = () => {
               </div>
               <div className="flex justify-between font-bold text-xl text-bentonville-blue mt-2">
                 <span>Estimated total</span>
-                <span>
-                  {estimatedTotal !== undefined
-                    ? `$${Number(estimatedTotal).toFixed(2)}`
-                    : "N/A"}
-                </span>
+                <span>${Number(estimatedTotal).toFixed(2)}</span>
               </div>
             </div>
 
-            {products.length > 0 && (
-              <button
-                className="bg-red-500 text-white px-4 py-2 mt-8 rounded-lg shadow hover:bg-red-600 w-full font-semibold transition"
-                onClick={clearCart}
-              >
-                Clear Cart
-              </button>
-            )}
+            <button
+              className="bg-red-500 text-white px-4 py-2 mt-8 rounded-lg shadow hover:bg-red-600 w-full font-semibold transition"
+              onClick={clearCart}
+            >
+              Clear Cart
+            </button>
           </div>
 
-          {/* Recommended Products */}
+          {/* Recommended products */}
           <div className="bg-white p-6 rounded-lg shadow border border-gray-100">
             <h3 className="text-lg font-bold text-bentonville-blue mb-4">
               Recommended for you
             </h3>
             <div className="grid grid-cols-2 gap-4">
-              {recommended.length === 0 ? (
-                <span className="text-gray-500 text-sm">
-                  No recommendations available.
-                </span>
-              ) : (
-                recommended.map((prod) => (
-                  <Link
-                    key={prod._id}
-                    to={`/product/${prod._id}`}
-                    className="flex flex-col items-center bg-gray-50 rounded-lg p-3 hover:shadow transition"
-                  >
-                    <img
-                      src={
-                        prod.image_urls && prod.image_urls.length > 0
-                          ? prod.image_urls[0]
-                          : "/src/assets/pictures/placeholder.png"
-                      }
-                      alt={prod.name}
-                      className="w-20 h-20 object-cover rounded mb-2"
-                    />
-                    <span className="text-xs font-semibold text-gray-700 text-center">
-                      {prod.name}
-                    </span>
-                    <span className="text-xs text-green-600 font-bold mt-1">
-                      ${prod.price}
-                    </span>
-                  </Link>
-                ))
-              )}
+              {recommended.map((prod) => (
+                <Link
+                  key={prod._id}
+                  to={`/product/${prod._id}`}
+                  className="flex flex-col items-center bg-gray-50 rounded-lg p-3 hover:shadow transition"
+                >
+                  <img
+                    src={
+                      prod.image_urls?.[0] ||
+                      "/src/assets/pictures/placeholder.png"
+                    }
+                    alt={prod.name}
+                    className="w-20 h-20 object-cover rounded mb-2"
+                  />
+                  <span className="text-xs font-semibold text-gray-700 text-center">
+                    {prod.name}
+                  </span>
+                  <span className="text-xs text-green-600 font-bold mt-1">
+                    ${prod.price}
+                  </span>
+                </Link>
+              ))}
             </div>
           </div>
         </div>
