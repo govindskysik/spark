@@ -674,6 +674,25 @@ const SparkModal = ({ toggleSpark }) => {
             )}
           </button>
         </div>
+
+        {/* Play Voice Button when TTS audio is ready */}
+        {ttsAudio && !isTTSPlaying && (
+          <>
+            <button
+              className="bg-bentonville-blue text-white px-3 py-1 rounded mt-2"
+              onClick={() => {
+                ttsAudio.play();
+                setIsTTSPlaying(true);
+                setIsTTSPAused(false);
+              }}
+            >
+              Play Voice
+            </button>
+            <div className="text-xs text-gray-500 mt-2">
+              Tap "Play Voice" to hear the assistant reply (required on mobile).
+            </div>
+          </>
+        )}
       </motion.div>
     </>
   );
