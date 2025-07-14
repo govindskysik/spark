@@ -7,13 +7,21 @@ const agentClient = axios.create({
 });
 
 const agentService = {
-  getAgentResponse: async ({ user_name, user_age, user_input, last_response_id = '', use_structuring = false }) => {
+  getAgentResponse: async ({
+    user_name,
+    user_age,
+    user_input,
+    last_response_id = '',
+    use_structuring = false,
+    user_jwt
+  }) => {
     const body = {
       user_name,
       user_age,
       user_input,
       last_response_id,
-      use_structuring
+      use_structuring,
+      user_jwt
     };
 
     const response = await agentClient.post('/agent_response', body);

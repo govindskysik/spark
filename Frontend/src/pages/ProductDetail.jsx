@@ -62,8 +62,7 @@ const ProductDetail = () => {
       size: selectedSize,
       color: selectedColor,
     };
-    console.log("Adding to cart:", payload);
-
+    console.log("Adding to cart:", payload); // <-- This will show exactly what is sent
     try {
       await cartService.addToCart(payload);
     } catch (err) {

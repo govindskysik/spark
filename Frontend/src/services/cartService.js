@@ -15,6 +15,7 @@ apiClient.interceptors.request.use(config => {
 const cartService = {
   addToCart: async (payload) => {
     const res = await apiClient.post(API_CONFIG.ENDPOINTS.CART.ADD, payload);
+    console.log("Added to cart:", res);
     return res.data;
   },
   getCart: async () => {
