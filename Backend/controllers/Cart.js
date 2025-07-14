@@ -35,7 +35,7 @@ const addToCart = async (req, res) => {
       session.endSession();
       return res.status(StatusCodes.BAD_REQUEST).json({
         success: false,
-        message: "product not available"
+        message: "product is out of stock"
       });
     }
     if( !product.available_for_delivery){
@@ -46,12 +46,20 @@ const addToCart = async (req, res) => {
         message: "product not available for delivery"
       });
     }
-    if ((size && !product.sizes.includes(size)) || (color && !product.colors.includes(color))) {
+    if ((size && !product.sizes.includes(size)) ) {
       await session.abortTransaction();
       session.endSession();
       return res.status(StatusCodes.BAD_REQUEST).json({
         success: false,
-        message: "size/color not available"
+        message: "size not available"
+      });
+    }
+    if((color && !product.colors.includes(color))){
+      await session.abortTransaction();
+      session.endSession();
+      return res.status(StatusCodes.BAD_REQUEST).json({
+        success: false,
+        message: "color not available"
       });
     }
 
@@ -96,7 +104,7 @@ const addToCart = async (req, res) => {
     console.log('error while adding to the cart ', error);
     return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
       success: false,
-      message: "error while adding to the cart "
+      message: "some technical difficulties while adding to the cart. Try again later "
     });
   }
 };
@@ -139,17 +147,7 @@ const removeFromCart = async (req, res) => {
 
     await cart.save({ session });
 
-    // async function processProducts(cart){
-    //   let products=[]
-    //   for(const pro of cart.products){
-    //     const embeddings=await Product.findById(pro.productId).select('embedding embedding_text').session(session)
-    //     products.push({
-    //       pro,
-    //       embedding:embeddings.embedding,
-    //       embedding_text:embeddings.embedding_text,
-    //     })
-    //   }
-    // }
+    
     const productsWithEmbedding=await processProducts(cart,session)
     await session.commitTransaction();
     session.endSession();
@@ -168,7 +166,7 @@ const removeFromCart = async (req, res) => {
     console.log("Error while removing from cart", error);
     return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
       success: false,
-      message: "Error while removing from cart"
+      message: "some technical difficulties while removing from the cart. Try again later"
     });
   }
 };
@@ -239,7 +237,8 @@ const updateCartItem = async (req, res) => {
       session.endSession();
       return res.status(StatusCodes.BAD_REQUEST).json({
         success: false,
-        message: "Cannot add more than available stock"
+        message: `maximum available quantity is ${product.quantity}`,
+        
       });
     }
 
@@ -265,7 +264,7 @@ const updateCartItem = async (req, res) => {
     session.endSession();
     return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
       success: false,
-      message: "Error while updating cart item"
+      message: "Technical difficulties while updating cart item"
     });
   }
 };
@@ -312,7 +311,7 @@ const clearCart = async (req, res) => {
     console.log("Unable to empty the cart", error);
     return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
       success: false,
-      message: "Unable to empty the cart"
+      message: "Technical difficulties ,unable to empty the cart"
     });
   }
 };
@@ -335,20 +334,8 @@ const viewCart=async(req,res)=>{
                 }
             })
         }
-        // async function ProcessProducts(cart){
-        //   let products=[];
-        //   for(const pro of cart.products) {
-        //     const embeddings=await Product.findById(pro.productId).select('embedding embedding_text')
-        //     products.push({
-        //       pro,
-        //       embedding:embeddings.embedding,
-        //       embedding_text:embeddings.embedding_text,
-        //     })
-        //   }
-        //   return products
-        // }
+      
         const productsWithEmbedding=await processProducts(cart)
-        // console.log(productsWithEmbedding)
         return res.status(StatusCodes.OK).json({
             success:true,
             data:{
@@ -358,7 +345,7 @@ const viewCart=async(req,res)=>{
         })
     } catch (error) {
         console.log(`error while fetching cart items`,error);
-        return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({success:false,message:"error while fetching cart items"})
+        return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({success:false,message:"Technical difficulties while fetching cart items"})
     }
 }
 
