@@ -26,6 +26,7 @@ const addToCart = async (req, res) => {
     const { userId } = req.user;
     console.log("User ID:", userId);
     const { quantity, productId, size, color } = req.body;
+    console.log("User ID:", userId);
     const product = await Product.findById(productId)
       .select('final_price sizes colors available_for_delivery quantity')
       .session(session);
