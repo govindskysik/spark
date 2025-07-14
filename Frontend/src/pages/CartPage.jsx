@@ -12,11 +12,21 @@ import useCartStore from "../store/useCartStore";
 import productService from "../services/productService";
 import categoryService from "../services/categoryService";
 
+const placeholderImage = "/src/assets/pictures/placeholder.png";
+
 const CartPage = () => {
-  const { products, totalPrice, fetchCart, removeItem, updateItem, clearCart } =
-    useCartStore();
+  const {
+    products = [],
+    totalPrice = 0,
+    fetchCart,
+    removeItem,
+    updateItem,
+    clearCart,
+  } = useCartStore();
+
   const [productImages, setProductImages] = useState({});
   const [productNames, setProductNames] = useState({});
+  const [productPrices, setProductPrices] = useState({});
   const [recommended, setRecommended] = useState([]);
   const [allCategories, setAllCategories] = useState([]);
   const [randomCategories, setRandomCategories] = useState([]);
@@ -30,27 +40,42 @@ const CartPage = () => {
     const fetchDetails = async () => {
       const imagesMap = {};
       const namesMap = {};
+      const pricesMap = {};
       await Promise.all(
-        products.map(async (p) => {
-          try {
-            const res = await productService.getProductById(p.productId);
-            if (res && res.product) {
-              namesMap[p.productId] = res.product.name || `Product ${p.productId}`;
-              imagesMap[p.productId] =
-                res.product.image_urls?.[0] ||
-                "/src/assets/pictures/placeholder.png";
-            } else {
-              namesMap[p.productId] = `Product ${p.productId}`;
-              imagesMap[p.productId] = "/src/assets/pictures/placeholder.png";
+        products
+          .map((p) => p.pro ? p.pro : p)
+          .filter((info) => info.productId)
+          .map(async (info) => {
+            try {
+              const res = await productService.getProductById(info.productId);
+              if (res && res.product) {
+                namesMap[info.productId] =
+                  res.product.name ||
+                  res.product.product_name ||
+                  `Product ${info.productId}`;
+                imagesMap[info.productId] =
+                  res.product.image_urls?.[0] || placeholderImage;
+                pricesMap[info.productId] =
+                  res.product.final_price !== undefined
+                    ? res.product.final_price
+                    : res.product.price !== undefined
+                    ? res.product.price
+                    : null;
+              } else {
+                namesMap[info.productId] = `Product ${info.productId}`;
+                imagesMap[info.productId] = placeholderImage;
+                pricesMap[info.productId] = null;
+              }
+            } catch {
+              namesMap[info.productId] = `Product ${info.productId}`;
+              imagesMap[info.productId] = placeholderImage;
+              pricesMap[info.productId] = null;
             }
-          } catch {
-            namesMap[p.productId] = `Product ${p.productId}`;
-            imagesMap[p.productId] = "/src/assets/pictures/placeholder.png";
-          }
-        })
+          })
       );
       setProductImages(imagesMap);
       setProductNames(namesMap);
+      setProductPrices(pricesMap);
     };
     if (products.length > 0) fetchDetails();
   }, [products]);
@@ -146,112 +171,115 @@ const CartPage = () => {
             </span>
 
             {/* Cart items list */}
-            {products.map((p, i) => (
-              <div
-                key={i}
-                className="bg-white p-4 rounded-lg shadow flex flex-col md:flex-row items-start md:items-center justify-between gap-6 border border-gray-100 text-sm mt-4"
-              >
-                <div className="flex items-center gap-4 w-full">
-                  <img
-                    src={productImages[p.productId]}
-                    alt={productNames[p.productId]}
-                    className="w-20 h-20 object-cover rounded border border-gray-200"
-                  />
-                  <div className="flex-1">
-                    <h3 className="font-semibold text-bentonville-blue text-base mb-1">
-                      {productNames[p.productId]}
-                    </h3>
-                    <div className="flex gap-4 text-xs text-gray-600 mb-2">
-                      <span>
-                        Size: <span className="font-bold">{p.size || "-"}</span>
-                      </span>
-                      <span>
-                        Color: <span className="font-bold">{p.color || "-"}</span>
-                      </span>
-                    </div>
-                    <div className="flex gap-2 items-center text-xs mb-2">
-                      <Gift className="w-4 h-4 text-yellow-500" />
-                      <span>Gift Eligible</span>
-                      <span className="ml-2 font-bold text-green-600">
-                        Free 90-day returns
-                      </span>
-                    </div>
-                    <div className="flex gap-2 items-center text-xs">
-                      <span className="bg-blue-100 text-blue-800 px-2 py-0.5 rounded font-semibold">
-                        Deal
-                      </span>
-                      <span className="text-gray-500">
-                        Sold and shipped by{" "}
-                        <span className="font-bold text-gray-700">Walmart</span>
-                      </span>
-                    </div>
-                  </div>
-                </div>
-                <div className="flex flex-col items-end gap-2 min-w-[120px]">
-                  <div className="flex gap-2 items-center">
-                    <button
-                      onClick={() =>
-                        removeItem({
-                          productId: p.productId,
-                          size: p.size,
-                          color: p.color,
-                        })
-                      }
-                      className="px-2 py-1 bg-red-500 text-white rounded text-base font-bold hover:bg-red-600 transition"
-                    >
-                      -
-                    </button>
-                    <span className="font-semibold text-base">{p.quantity}</span>
-                    <button
-                      onClick={() =>
-                        updateItem({
-                          productId: p.productId,
-                          size: p.size,
-                          color: p.color,
-                        })
-                      }
-                      className="px-2 py-1 bg-true-blue text-white rounded text-base font-bold hover:bg-blue-700 transition"
-                    >
-                      +
-                    </button>
-                  </div>
-                  <div className="text-right mt-2">
-                    <span className="text-green-600 font-bold text-base">
-                      {p.price !== undefined
-                        ? `$${Number(p.price).toFixed(2)}`
-                        : "N/A"}
-                    </span>
-                    {p.initial_price && p.initial_price > p.price && (
-                      <>
-                        <span className="line-through text-gray-400 ml-2">
-                          ${Number(p.initial_price).toFixed(2)}
+            {products.map((p, i) => {
+              const info = p.pro ? p.pro : p;
+              return (
+                <div
+                  key={info.productId ?? i}
+                  className="bg-white p-4 rounded-lg shadow flex flex-col md:flex-row items-start md:items-center justify-between gap-6 border border-gray-100 text-sm mt-4"
+                >
+                  <div className="flex items-center gap-4 w-full">
+                    <img
+                      src={productImages[info.productId]}
+                      alt={productNames[info.productId]}
+                      className="w-20 h-20 object-cover rounded border border-gray-200"
+                    />
+                    <div className="flex-1">
+                      <h3 className="font-semibold text-bentonville-blue text-base mb-1">
+                        {productNames[info.productId]}
+                      </h3>
+                      <div className="flex gap-4 text-xs text-gray-600 mb-2">
+                        <span>
+                          Size: <span className="font-bold">{info.size || "-"}</span>
                         </span>
-                        <div className="text-xs text-green-700 mt-1">
-                          You save ${Number(p.initial_price - p.price).toFixed(2)}
-                        </div>
-                      </>
-                    )}
+                        <span>
+                          Color: <span className="font-bold">{info.color || "-"}</span>
+                        </span>
+                      </div>
+                      <div className="flex gap-2 items-center text-xs mb-2">
+                        <Gift className="w-4 h-4 text-yellow-500" />
+                        <span>Gift Eligible</span>
+                        <span className="ml-2 font-bold text-green-600">
+                          Free 90-day returns
+                        </span>
+                      </div>
+                      <div className="flex gap-2 items-center text-xs">
+                        <span className="bg-blue-100 text-blue-800 px-2 py-0.5 rounded font-semibold">
+                          Deal
+                        </span>
+                        <span className="text-gray-500">
+                          Sold and shipped by{" "}
+                          <span className="font-bold text-gray-700">Walmart</span>
+                        </span>
+                      </div>
+                    </div>
                   </div>
-                  <div className="flex gap-2 mt-2">
-                    <button
-                      className="text-xs text-gray-500 underline hover:text-red-600"
-                      onClick={() =>
-                        removeItem({
-                          productId: p.productId,
-                          size: p.size,
-                          color: p.color,
-                        })
-                      }
-                    >
-                      Remove
-                    </button>
-                    <button className="text-xs text-gray-500 underline hover:text-true-blue">
-                      Save for later
-                    </button>
+                  <div className="flex flex-col items-end gap-2 min-w-[120px]">
+                    <div className="flex gap-2 items-center">
+                      <button
+                        onClick={() =>
+                          removeItem({
+                            productId: info.productId,
+                            size: info.size,
+                            color: info.color,
+                          })
+                        }
+                        className="px-2 py-1 bg-red-500 text-white rounded text-base font-bold hover:bg-red-600 transition"
+                      >
+                        -
+                      </button>
+                      <span className="font-semibold text-base">{info.quantity}</span>
+                      <button
+                        onClick={() =>
+                          updateItem({
+                            productId: info.productId,
+                            size: info.size,
+                            color: info.color,
+                          })
+                        }
+                        className="px-2 py-1 bg-true-blue text-white rounded text-base font-bold hover:bg-blue-700 transition"
+                      >
+                        +
+                      </button>
+                    </div>
+                    <div className="text-right mt-2">
+                      <span className="text-green-600 font-bold text-base">
+                        {productPrices[info.productId] !== undefined && productPrices[info.productId] !== null
+                          ? `$${Number(productPrices[info.productId]).toFixed(2)}`
+                          : "N/A"}
+                      </span>
+                      {info.initial_price && info.initial_price > info.final_price && (
+                        <>
+                          <span className="line-through text-gray-400 ml-2">
+                            ${Number(product.initial_price).toFixed(2)}
+                          </span>
+                          <div className="text-xs text-green-700 mt-1">
+                            You save ${Number(info.discount ?? (info.initial_price - info.final_price)).toFixed(2)}
+                          </div>
+                        </>
+                      )}
+                    </div>
+                    <div className="flex gap-2 mt-2">
+                      <button
+                        className="text-xs text-gray-500 underline hover:text-red-600"
+                        onClick={() =>
+                          removeItem({
+                            productId: info.productId,
+                            size: info.size,
+                            color: info.color,
+                          })
+                        }
+                      >
+                        Remove
+                      </button>
+                      <button className="text-xs text-gray-500 underline hover:text-true-blue">
+                        Save for later
+                      </button>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
 

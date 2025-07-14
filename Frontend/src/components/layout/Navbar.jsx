@@ -23,7 +23,7 @@ const Navbar = ({ isMenuOpen, toggleMenu, openAuthModal }) => {
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [categories, setCategories] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
-  const { products, fetchCart } = useCartStore();
+  const { products = [], fetchCart } = useCartStore();
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -161,12 +161,17 @@ const Navbar = ({ isMenuOpen, toggleMenu, openAuthModal }) => {
               aria-label="View Cart"
             >
               <ShoppingCart className="text-white w-6 h-6" />
-              {products.length > 0 && (
-                <span className="absolute -top-1 -right-2 bg-spark-yellow text-bentonville-blue text-[10px] flex items-center justify-center w-4 h-4 font-bold  rounded-full">
-                  {products.reduce(
-                    (sum, item) => sum + (item.quantity || 0),
-                    0
-                  )}
+              {(products && products.length > 0) && (
+                <span className="absolute -top-1 -right-2 bg-spark-yellow text-bentonville-blue text-[10px] flex items-center justify-center w-4 h-4 font-bold rounded-full">
+                  {
+                    products.reduce(
+                      (sum, item) => {
+                        const info = item.pro ? item.pro : item;
+                        return sum + (info.quantity || 0);
+                      },
+                      0
+                    )
+                  }
                 </span>
               )}
             </button>

@@ -11,7 +11,12 @@ const useCartStore = create((set) => ({
     set({ loading: true });
     try {
       const res = await cartService.getCart();
-      set({ products: res.data.products, totalPrice: res.data.total_price, loading: false });
+      // FIX: Use res.data.products and res.data.total_price
+      set({
+        products: res.data.products,
+        totalPrice: res.data.total_price,
+        loading: false
+      });
     } catch (error) {
       set({ error: error.message, loading: false });
     }

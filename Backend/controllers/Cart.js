@@ -24,13 +24,15 @@ const addToCart = async (req, res) => {
   session.startTransaction();
   try {
     const { userId } = req.user;
-    console.log("User ID:", userId);
+    console.log("Request Body:", req.body);
     const { quantity, productId, size, color } = req.body;
     // console.log("User ID:", productId);
     const product = await Product.findById(productId)
       .select('final_price sizes colors available_for_delivery quantity')
       .session(session);
 
+    console.log("111");
+ 
     if (!product  || quantity > product.quantity) {
       await session.abortTransaction();
       session.endSession();
@@ -39,6 +41,7 @@ const addToCart = async (req, res) => {
         message: "product is out of stock"
       });
     }
+    console.log("222");
     if( !product.available_for_delivery){
       await session.abortTransaction();
       session.endSession();
@@ -50,6 +53,7 @@ const addToCart = async (req, res) => {
     if ((size && !product.sizes.includes(size)) ) {
       await session.abortTransaction();
       session.endSession();
+      console.log("333");
       return res.status(StatusCodes.BAD_REQUEST).json({
         success: false,
         message: "size not available"
@@ -66,6 +70,8 @@ const addToCart = async (req, res) => {
 
     let cart = await Cart.findOne({ userId }).session(session);
     const product_price = product.final_price * quantity;
+    console.log("product_price", product_price);
+    console.log("Quantity", quantity);
 
     if (!cart) {
       cart = await Cart.create([{
@@ -90,8 +96,11 @@ const addToCart = async (req, res) => {
       await cart.save({ session });
     }
 
+    console.log("cart", cart);
+
     await session.commitTransaction();
     session.endSession();
+    console.log("5555");
     return res.status(StatusCodes.OK).json({
       success: true,
       message:"product found and added to cart",

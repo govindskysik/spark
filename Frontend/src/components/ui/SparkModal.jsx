@@ -44,7 +44,7 @@ const SparkModal = ({ toggleSpark }) => {
     addItem,
     removeItem,
     updateItem,
-    products: cartProducts,
+    products: cartProducts = [],
   } = useCartStore();
 
   const mediaRecorderRef = useRef(null);
@@ -60,6 +60,7 @@ const SparkModal = ({ toggleSpark }) => {
   const [typingText, setTypingText] = useState(null);
   const [productsExpanded, setProductsExpanded] = useState(false);
   const [products, setProducts] = useState([]);
+  const [last_response_id, setLastResponseId] = useState("");
 
   useEffect(() => {
     if (products.length > 0) setProductsExpanded(true);
@@ -117,7 +118,6 @@ const SparkModal = ({ toggleSpark }) => {
     };
   };
 
-  // Pause/Resume TTS
   const handleTTSPauseResume = () => {
     if (ttsAudio) {
       if (isTTSPAused) {
@@ -133,32 +133,61 @@ const SparkModal = ({ toggleSpark }) => {
   const sendAudioToBackend = async (blob) => {
     try {
       const text = await transcriptionService.sendAudio(blob);
-      if (text) {
-        typewriterEffect(text);
 
+      if (!text) {
+        const user_jwt = localStorage.getItem("token");
         const agentReply = await agentService.getAgentResponse({
           user_name: user?.username || "Guest",
           user_age: user?.age || 0,
           user_input: text,
-          last_response_id: "",
+          last_response_id: last_response_id || "",
           use_structuring: false,
+          user_jwt,
         });
 
-        const rawResponse = agentReply.final_output || agentReply.message || "";
-        const productIds = extractProductIds(rawResponse);
-        const cleanText = formatAgentMessage(rawResponse);
-
-        const audioUrl = await transcriptionService.getSpeechFromText(
-          cleanText
-        );
-        if (audioUrl) {
-          playTTS(audioUrl);
+        if (agentReply.new_message_id) {
+          setLastResponseId(agentReply.new_message_id);
         }
 
-        const fetchedProducts = await fetchProductsByIds(productIds);
-        setProducts(fetchedProducts);
-        setChatHistory((prev) => [...prev, { role: "agent", text: cleanText }]);
+        const rawResponse = agentReply.final_output || agentReply.message || "";
+        const cleanText = formatAgentMessage(rawResponse);
+
+        setChatHistory((prev) => [
+          ...prev,
+          { role: "agent", text: "Sorry, we could not transcribe your voice. Here's the agent reply:" },
+          { role: "agent", text: cleanText }
+        ]);
+        return;
       }
+
+      typewriterEffect(text);
+
+      const user_jwt = localStorage.getItem("token");
+      const agentReply = await agentService.getAgentResponse({
+        user_name: user?.username || "Guest",
+        user_age: user?.age || 0,
+        user_input: text,
+        last_response_id: last_response_id || "",
+        use_structuring: false,
+        user_jwt,
+      });
+
+      if (agentReply.new_message_id) {
+        setLastResponseId(agentReply.new_message_id);
+      }
+
+      const rawResponse = agentReply.final_output || agentReply.message || "";
+      const productIds = extractProductIds(rawResponse);
+      const cleanText = formatAgentMessage(rawResponse);
+
+      const audioUrl = await transcriptionService.getSpeechFromText(cleanText);
+      if (audioUrl) {
+        playTTS(audioUrl);
+      }
+
+      const fetchedProducts = await fetchProductsByIds(productIds);
+      setProducts(fetchedProducts);
+      setChatHistory((prev) => [...prev, { role: "agent", text: cleanText }]);
     } catch (err) {
       console.error("Transcription/Agent error:", err);
     }
@@ -237,7 +266,9 @@ const SparkModal = ({ toggleSpark }) => {
     useEffect(() => {
       const initial = {};
       products.forEach((p) => {
-        const cartItem = cartProducts.find((item) => item.productId === p._id);
+        const cartItem = (cartProducts || []).find(
+          (item) => item.productId === p._id
+        );
         if (cartItem) initial[p._id] = cartItem.quantity;
       });
       setQuantities(initial);
