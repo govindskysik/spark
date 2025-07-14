@@ -26,7 +26,7 @@ const addToCart = async (req, res) => {
     const { userId } = req.user;
     console.log("User ID:", userId);
     const { quantity, productId, size, color } = req.body;
-    console.log("User ID:", userId);
+    console.log("User ID:", productId);
     const product = await Product.findById(productId)
       .select('final_price sizes colors available_for_delivery quantity')
       .session(session);
@@ -320,6 +320,7 @@ const clearCart = async (req, res) => {
 const viewCart=async(req,res)=>{
     try {
         const {userId}=req.user;
+        console.log(`inside user ${userId}`)
         const cart=await Cart.findOne({userId})
         if(!cart){
             return res.status(StatusCodes.NOT_FOUND).json({success:false,message:"cart not found"}) 
