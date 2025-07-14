@@ -83,7 +83,7 @@ const SparkModal = ({ toggleSpark }) => {
       .replace(/\*\*(.*?)\*\*/g, "**$1**") // bold preservation
       .replace(/- /g, "- ") // list item bullet
       .trim();
-    return `**Here's what I found:**\n\n${formatted}`;
+    return `${formatted}`;
   };
 
   const typewriterEffect = (text) => {
