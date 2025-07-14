@@ -5,6 +5,7 @@ import SlidingMenu from './components/layout/SlidingMenu'
 import SparkButton from './components/ui/SparkButton'
 import useAuthStore from './store/authStore'
 import { Toaster } from 'react-hot-toast'
+import Footer from './components/layout/Footer'
 
 const App = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -19,7 +20,7 @@ const App = () => {
   };
 
   return (
-    <div className="min-h-screen bg-white overflow-x-hidden">
+    <div className="min-h-screen bg-white overflow-x-hidden flex flex-col">
       <Toaster 
         position="top-right"
         toastOptions={{
@@ -60,17 +61,20 @@ const App = () => {
       
       {/* Main content that transforms and has padding for the navbar */}
       <div 
-        className={`transition-transform duration-500 ease-out ${
+        className={`transition-transform duration-500 ease-out flex-1 ${
           isMenuOpen ? 'transform translate-x-80' : 'transform translate-x-0'
         }`}
       >
-        <main > 
+        <main> 
           <AppRouter />
         </main>
       </div>
       
       {/* Spark Button - Fixed at bottom */}
       <SparkButton />
+
+      {/* Footer */}
+      <Footer />
     </div>
   )
 }

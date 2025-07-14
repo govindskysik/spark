@@ -1,5 +1,5 @@
 const API_CONFIG = {
-  BASE_URL: import.meta.env.VITE_API_BASE_URL ,
+  BASE_URL: import.meta.env.VITE_API_BASE_URL|| "https://localhost:3000", 
   BASE_URL_AGENT: import.meta.env.VITE_API_BASE_URL_AGENT,
 
   ENDPOINTS: {

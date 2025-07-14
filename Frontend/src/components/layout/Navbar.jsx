@@ -163,7 +163,10 @@ const Navbar = ({ isMenuOpen, toggleMenu }) => {
               <ShoppingCart className="text-white w-6 h-6" />
               {products.length > 0 && (
                 <span className="absolute -top-1 -right-2 bg-spark-yellow text-bentonville-blue text-[10px] flex items-center justify-center w-4 h-4 font-bold  rounded-full">
-                  {products.reduce((sum, item) => sum + item.quantity, 0)}
+                  {products.reduce(
+                    (sum, item) => sum + (item.quantity || 0),
+                    0
+                  )}
                 </span>
               )}
             </button>
@@ -183,7 +186,6 @@ const Navbar = ({ isMenuOpen, toggleMenu }) => {
             </button>
           </div>
 
-          {/* Spacer for mobile */}
           <div className="flex-1 md:hidden"></div>
         </div>
       </div>
