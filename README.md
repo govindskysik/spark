@@ -20,7 +20,7 @@ A conversational shopping assistant that allows users to search and add products
 
 | Frontend | Backend | AI & NLP | Storage |
 |----------|---------|----------|---------|
-| React, TailwindCSS | Node.js (serverless) | OpenAI Whisper (STT), ChatGPT (NLP), TTS APIs | MongoDB |
+| React, TailwindCSS | Node.js | OpenAI Whisper (STT), ChatGPT (NLP), TTS APIs | MongoDB |
 
 - **Whisper**: Converts voice input to text.
 - **ChatGPT API**: Processes intent, provides context-aware replies.
@@ -45,5 +45,5 @@ A conversational shopping assistant that allows users to search and add products
 *(Optional: You can add screenshots here using Markdown syntax)*
 
 ```md
-![Voice Command Example]![WhatsApp Image 2025-07-14 at 17 06 00_fcdc7d10](https://github.com/user-attachments/assets/ed59b18b-0389-45e6-a7c7-b3c8377528af)
+[Voice Command Example](https://github.com/govindskysik/spark/blob/main/Frontend/src/assets/SS.jpg)
 )
