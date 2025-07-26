@@ -8,42 +8,37 @@ A conversational shopping assistant that allows users to search and add products
 
 ## 🚀 Features
 
-- 🎙️ **Voice Commands**: Talk to Spark to search products or add items to your cart.
-- 🧠 **Conversational AI**: ChatGPT understands natural queries and gives contextual replies.
-- 🛒 **Dynamic Cart System**: Products are added/removed from cart in real-time.
-- 🔊 **Text-to-Speech Responses**: Spark replies verbally for an immersive experience.
-- 📦 **Smart Recommendations**: Products fetched from Amazon/Walmart based on AI-generated prompts.
+- 🎙️ **Voice Commands** – Talk to Spark to search products or add items to your cart.
+- 🧠 **Conversational AI** – ChatGPT understands natural queries and gives contextual replies.
+- 🛒 **Dynamic Cart System** – Products are added/removed from cart in real-time.
+- 🔊 **Text-to-Speech** – Spark replies using AI-generated speech.
+- 📦 **Smart Recommendations** – Product suggestions from Amazon/Walmart using AI queries.
 
 ---
 
 ## 🛠️ Tech Stack
 
-| Frontend | Backend | AI & NLP | Storage |
-|----------|---------|----------|---------|
-| React, TailwindCSS | Node.js | OpenAI Whisper (STT), ChatGPT (NLP), TTS APIs | MongoDB |
+| Frontend        | Backend       | AI & NLP                                | Database |
+|-----------------|---------------|------------------------------------------|----------|
+| React, TailwindCSS | Node.js (Serverless) | OpenAI Whisper (STT), ChatGPT, TTS API | MongoDB  |
 
-- **Whisper**: Converts voice input to text.
-- **ChatGPT API**: Processes intent, provides context-aware replies.
-- **TTS API**: Converts text back into speech for voice replies.
-- **MongoDB**: Stores cart and user session data.
+- **Whisper** – Converts speech to text
+- **ChatGPT API** – Understands user intent and generates response
+- **TTS API** – Converts replies into spoken voice
+- **MongoDB** – Stores cart items and session data
 
 ---
 
 ## 🎮 How It Works
 
-1. Click on the microphone button to speak your command.
-2. Your voice is converted to text using **Whisper**.
-3. The text is processed by **ChatGPT** to understand the user intent.
-4. Product suggestions are fetched using AI-enhanced queries.
-5. Spark speaks the reply using **Text-to-Speech**.
-6. Products are displayed and can be added to cart interactively.
+1. Click the 🎤 microphone button to start speaking.
+2. **Whisper** transcribes your voice to text.
+3. **ChatGPT** interprets what you want (search, add to cart, etc.).
+4. Spark responds using **Text-to-Speech**.
+5. Products are displayed and updated live on screen.
 
 ---
 
 ## 📸 Screenshots
 
-*(Optional: You can add screenshots here using Markdown syntax)*
-
-```md
-[Voice Command Example](https://github.com/govindskysik/spark/blob/main/Frontend/src/assets/SS.jpg)
-)
+![Voice Command Example](https://github.com/govindskysik/spark/blob/main/Frontend/src/assets/SS.jpg)
